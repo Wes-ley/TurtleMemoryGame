@@ -1,6 +1,12 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:300,900);
+
+html{
+    position:fixed;
+    overflow:hidden;
+}
 body {
     font-family: 'Lato', sans-serif;
+    overflow: hidden;
 }
 
 * {
@@ -15,7 +21,7 @@ body {
     width: 100vw;
     height: 100vh;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: hidden;
     font-size: 100%;
     font-style: normal;
     font-weight: 300;
@@ -284,22 +290,37 @@ progress {
     -webkit-appearance: none;
 }
 body { background-color: #00BFFF}
+
+
+.wrapper{
+    height: 100%;
+    overflow:hidden;
+}
+
 .turtle {
+
     position: absolute;
+    overflow: hidden;
+    display:block;
     top: 50%;
     left: 50%;
+
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+
     width: 500px;
     height: 500px;
+    /*
     -webkit-animation: walking-turtle-02 10s ease-in-out infinite alternate;
     animation: walking-turtle-02 10s ease-in-out infinite alternate;
+    */
 }
 
 .shell {
+
     width: 220px;
     height: 250px;
-    background-color: #6A757A;
+    background-color: #636E72;
     border-radius: 50%;
     position: absolute;
     top: 50%;
@@ -309,14 +330,27 @@ body { background-color: #00BFFF}
     overflow: hidden;
 }
 
-.shell::before {
+#red.shell::before{
+    background-color: #4c0000;
+}
+#blue.shell::before{
+    background-color: #00004c;
+}
+#green.shell::before{
+    background-color: #001e00;
+}
+#yellow.shell::before{
+    background-color: #7f7f00;
+}
+
+.shell::before{
     content: "";
     position: absolute;
     top: 50%;
     left: 50%;
     width: 200px;
     height: 235px;
-    background-color: #5D666B;
+    background-color: #636E72;
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     border-radius: 50%;
@@ -331,13 +365,13 @@ body { background-color: #00BFFF}
     height: 100%;
     background-color: white;
     opacity: 0.1;
-
 }
 
 .shell div {
     width: 120px;
     height: 80px;
     background: #636E72;
+    opacity: 10;
     position: relative;
     top: 50%;
     left: 50%;
@@ -365,6 +399,47 @@ body { background-color: #00BFFF}
     border-right: 60px solid transparent;
     border-top: 30px solid #636E72;
 }
+
+#red.shell div{
+    background: #900000;
+}
+#red.shell div::after{
+    border-top: 30px solid #900000;
+}
+#red.shell div::before{
+    border-bottom: 30px solid #900000;
+}
+
+#green.shell div{
+    background: #003200;
+}
+#green.shell div::after{
+    border-top: 30px solid #003200;
+}
+#green.shell div::before{
+    border-bottom: 30px solid #003200;
+}
+
+#yellow.shell div{
+    background: #999900;
+}
+#yellow.shell div::after{
+    border-top: 30px solid #999900;
+}
+#yellow.shell div::before{
+    border-bottom: 30px solid #999900;
+}
+
+#blue.shell div{
+    background: #00007f;
+}
+#blue.shell div::after{
+    border-top: 30px solid #00007f;
+}
+#blue.shell div::before{
+    border-bottom: 30px solid #00007f;
+}
+
 .head {
     width: 75px;
     height: 85px;
