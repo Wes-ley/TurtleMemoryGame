@@ -1,42 +1,158 @@
+// movement and positioning vars
 var $window = $(window);
-var speed = 10;
-var spin_rate = 1;
-var logging = true;
-
-var turtles = new Array(4);
-
 var width = $window.width();
 var height = $window.height();
-console.log("window size: " + width + ", " + height);
+var speed = 2;
+var spin_rate = .2;
+var max_spin = 5;
+var starting_positions = [[200, 100, -1, -1, -1 ,0],
+    [width - 500, height - 400, 1, 1, 1, 180],
+    [200, height - 400, 1, 1, -1, 1],
+    [width - 500, 100, 1, -1, 1, 90]];
 
-var starting_positions = [ [0, 0, -1, -1, -1 ,0],
-            [width - 500, height - 500, 1, 1, 1, 180],
-            [0, height - 500, 1, 1, -1, 1],
-            [width - 500, 0, 1, -1, 1, 90]];
+// core game vars
+var system_pattern = [];
+var player_pattern = [];
+var system_index = 0;
+var player_index = 0;
+var run_memory;
+var tempo;
+var matching = true;
+var level = 0;
+var started = false;
+var colors = ["Red", "Yellow","Green", "Blue"];
 
+// page element access vars
+var turtles = new Array(4);
 for(var i = 1; i <= turtles.length; i++){
-    pos = starting_positions[i-1];
-    div = document.getElementById("trtl" + i);
+    var pos = starting_positions[i-1];
+    var div = document.getElementById("trtl" + i);
     turtles[i-1] = new Turtle(i, div, pos[0], pos[1], pos[2], pos[3], pos[4], pos[5]);
-    console.log(turtles[i-1]);
     init_turtle(i-1);
 }
 
-turtles[0].div.getElementsByClassName("shell")[0].setAttribute("id", "red");
-turtles[1].div.getElementsByClassName("shell")[0].setAttribute("id", "blue");
-turtles[2].div.getElementsByClassName("shell")[0].setAttribute("id", "green");
-turtles[3].div.getElementsByClassName("shell")[0].setAttribute("id", "yellow");
+// set turtle colors
+shuffle(colors);
 
+for(var i = 0; i < turtles.length; i++){
+    turtles[i].div.getElementsByClassName("shell")[0].setAttribute("id", colors[i]);
+}
 
 // turn on collision detection
-setInterval(BounceCollusion, 500);
+setInterval(BounceCollusion, 100);
+
+// add button functionality to start button
+document.getElementById("startButton").setAttribute("onclick", "Start(event)");
+
+var wrong = document.getElementById("soundbuttonWrong");
+
+console.log(wrong);
+
+wrong.volume = .2;
+console.log(wrong.volume);
+
+
+//turtles[0].shell.getElementsByTagName('div')[0].setAttribute("onclick", "test()");
+
+function Start(){
+    console.log("start button clicked")
+    started = true;
+    $("#startButton").css("pointer-events", "none");
+    $(".shell").css("pointer-events", "none");
+    level = 1;
+    $("#displayText").html("--");
+    matching = true;
+    clearInterval(run_memory);
+    newMemory();
+    setTimeout(function() {run_memory = setInterval(playMemory, 1000);}, 500);
+}
+
+$("div[class*='shell']").on("click", function(event) {
+    if(started == false)
+    {
+        console.log(this.id + " clicked")
+        $("#" + this.id).addClass("activated");
+        setTimeout(function (id) {$("#" + id).removeClass("activated"); }, 500, this.id);
+        $("#soundbutton" + this.id).get(0).cloneNode().play();
+
+    }
+    else if (event.which == 1) {
+        console.log(this.id + " clicked")
+        $("#" + this.id).addClass("activated");
+        $("#soundbutton" + this.id).get(0).cloneNode().play();
+        setTimeout(function (id) {$("#" + id).removeClass("activated"); }, 500, this.id);
+        player_pattern.push(this.id);
+        player_index++;
+
+        for (i = 0; i < player_pattern.length; i++) {
+            if (system_pattern[i] != player_pattern[i]) {
+                matching = false;
+            }
+        }
+        if (!matching) {
+            $("#displayText").html("!!");
+            wrong.play();
+            player_pattern = [];
+            system_index = 0;
+            player_index = 0;
+            matching = true;
+            $(".shell").css("pointer-events", "none");
+
+            // restart
+            system_pattern = [];
+            level = 1;
+            newMemory();
+            setTimeout(function() {run_memory = setInterval(playMemory, tempo);}, 1000);
+
+        }
+        else {
+            if (player_index == system_index) {
+                if (matching) {
+                    if (level == 20) {
+                        win();
+                    }
+                    else {
+                        player_pattern = [];
+                        system_index = 0;
+                        player_index = 0;
+                        newMemory();
+                        level++;
+
+                        switch(level) {
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                tempo = 1000;
+                                break;
+                            case 5:
+                                tempo = 700;
+                                break;
+                            case 9:
+                                tempo = 500;
+                                break;
+                            case 13:
+                                tempo = 300;
+                                break;
+                        }
+                        setTimeout(function() {run_memory = setInterval(playMemory, tempo);}, 1000);
+                        $(".shell").css("pointer-events", "none");
+                    }
+                }
+            }
+        }
+    }
+});
 
 // turtle constructor
 function Turtle(index, div ,x ,y, x_dir, y_dir, spin, degree) {
     this.index = index;
     this.div = div;
-    this.x = x;
-    this.y = y;
+    this.shell = div.getElementsByClassName("shell")[0];
+    this.x = x
+    this.y = y
+    this.div.style.left = x + "px";
+    this.div.style.top = y + "px";
     this.x_dir = x_dir;
     this.y_dir = y_dir;
     this.spin = spin;
@@ -47,18 +163,15 @@ function Turtle(index, div ,x ,y, x_dir, y_dir, spin, degree) {
 
 function init_turtle(x){
 
-    setInterval(BounceX, 100, turtles[x]);
-    setInterval(BounceY, 100, turtles[x]);
-    //SetInterval(BounceCollusion, 100, turtles[x]);
+    setInterval(BounceX, 20, turtles[x]);
+    setInterval(BounceY, 20, turtles[x]);
 }
 
 // "bounce" turtles off left and right boundries
 function BounceX (turtle){
 
     turtle.x = turtle.x + speed * turtle.x_dir;
-
     turtle.div.style.left = turtle.x + "px";
-
     turtle.degree += turtle.spin;
     rotate(turtle.div, turtle.degree);
 
@@ -90,7 +203,6 @@ function BounceY (turtle){
     else if( turtle.y > $window.height() - 400){
         UpdateSpin(turtle, turtle.x_dir, false);
         turtle.y_dir = -1;
-
     }
 }
 
@@ -98,7 +210,6 @@ function BounceY (turtle){
 function BounceCollusion (){
     for (var i = 0; i < turtles.length; i++){
         var t1 = turtles[i];
-        console.log(i);
 
         for(var j = i+1; j < turtles.length; j++) {
             var t2 = turtles[j];
@@ -106,7 +217,7 @@ function BounceCollusion (){
             var x_diff = t1.x - t2.x;
             var y_diff = t1.y - t2.y;
 
-            if ((x_diff < 250 && x_diff > -250) && (y_diff < 250 && y_diff > -250)){
+            if ((x_diff < 225 && x_diff > -225) && (y_diff < 225 && y_diff > -225)){
                 // bounce x
                 if (t1.x > t2.x){
                 t1.x_dir = 1;
@@ -125,7 +236,6 @@ function BounceCollusion (){
                     t1.y_dir = -1;
                     t2.y_dir = 1;
                 }
-
             }
         }
     }
@@ -148,10 +258,41 @@ function UpdateSpin (turtle, direction, top_or_right) {
     }
 
     //keep range limited
-    if (turtle.spin > 15)
-        turtle.spin = 15;
-    if (turtle.spin < -15)
-        turtle.spin = -15;
+    if (turtle.spin > max_spin)
+        turtle.spin = max_spin;
+    if (turtle.spin < -max_spin)
+        turtle.spin = -max_spin;
+}
+
+function newMemory() {
+    var temp = Math.floor((Math.random() * 4) + 1);
+    switch(temp) {
+        case 1:
+            system_pattern.push("Green");
+            break;
+        case 2:
+            system_pattern.push("Red");
+            break;
+        case 3:
+            system_pattern.push("Yellow");
+            break;
+        case 4:
+            system_pattern.push("Blue");
+            break;
+    }
+}
+
+function playMemory() {
+    $("#displayText").html(level);
+    tempColor = system_pattern[system_index];
+    $("#soundbutton" + tempColor).get(0).cloneNode().play();
+    $("#" + tempColor).addClass("activated");
+    setTimeout(function(id) {$("#" + id).removeClass("activated");}, 300, tempColor);
+    system_index++;
+    if (system_index == system_pattern.length) {
+        clearInterval(run_memory);
+        $(".shell").css("pointer-events", "auto");
+    }
 }
 
 function rotate(div, deg){
@@ -160,4 +301,15 @@ function rotate(div, deg){
     div.style.msTransform     = 'rotate('+deg+'deg)';
     div.style.oTransform      = 'rotate('+deg+'deg)';
     div.style.transform       = 'rotate('+deg+'deg)';
+}
+
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;
 }

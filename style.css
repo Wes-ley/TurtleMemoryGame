@@ -30,6 +30,74 @@ body {
     padding: 0;
 }
 
+#controls {
+    padding-top: 5px;
+    background-color: #fff;
+    border-color: #6A757A;
+    border-style: groove;
+    width: 115px;
+    height: 55px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    z-index: 99;
+
+}
+
+#startBox {
+    vertical-align: top;
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+}
+#startButton {
+    border: solid 2px black;
+    border-radius: 50%;
+    height: 50%;
+    margin: 0px 12.7px 0px 12.7px;
+    background: red;
+    font-size: 20px;
+    line-height: 20px;
+    text-align: center;
+    pointer-events: auto;
+}
+#startText {
+    height: 30%;
+    margin: 4px 6px 0px 6px;
+    font-size: 15px;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+}
+#countBox {
+    vertical-align: top;
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    float: right;
+}
+#countDisplay {
+    border: solid 2px black;
+    border-radius: 20%;
+    height: 50%;
+    margin: 0px 12.7px 0px 12.7px;
+    background: red;
+    font-size: 20px;
+    line-height: 20px;
+    text-align: center;
+}
+#countText {
+    height: 30%;
+    margin: 4px 6px 0px 6px;
+    font-size: 15px;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+}
+#displayText {
+    opacity: 1;
+}
+
 h1, h2, h3, h4, h5, h6, p, em, a, b, strong {
     font-style: normal;
     font-weight: 300;
@@ -295,25 +363,19 @@ body { background-color: #00BFFF}
 .wrapper{
     height: 100%;
     overflow:hidden;
+    pointer-events: none;
 }
 
 .turtle {
-
     position: absolute;
     overflow: hidden;
     display:block;
     top: 50%;
     left: 50%;
-
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-
     width: 500px;
     height: 500px;
-    /*
-    -webkit-animation: walking-turtle-02 10s ease-in-out infinite alternate;
-    animation: walking-turtle-02 10s ease-in-out infinite alternate;
-    */
 }
 
 .shell {
@@ -328,19 +390,7 @@ body { background-color: #00BFFF}
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     overflow: hidden;
-}
-
-#red.shell::before{
-    background-color: #4c0000;
-}
-#blue.shell::before{
-    background-color: #00004c;
-}
-#green.shell::before{
-    background-color: #001e00;
-}
-#yellow.shell::before{
-    background-color: #7f7f00;
+    pointer-events: auto;
 }
 
 .shell::before{
@@ -354,6 +404,34 @@ body { background-color: #00BFFF}
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     border-radius: 50%;
+}
+
+#Red.shell::before{
+    background-color: #4c0000;
+}
+
+#Red.activated.shell::before{
+    background-color: Red;
+}
+
+#Blue.shell::before{
+    background-color: #00004c;
+}
+#Blue.activated.shell::before{
+    background-color: Blue;
+}
+
+#Green.shell::before{
+    background-color: #001e00;
+}
+#Green.activated.shell::before{
+    background-color: Green;
+}
+#Yellow.shell::before{
+    background-color: #7f7f00;
+}
+#Yellow.activated.shell::before{
+    background-color: Yellow;
 }
 
 .shell::after {
@@ -371,12 +449,12 @@ body { background-color: #00BFFF}
     width: 120px;
     height: 80px;
     background: #636E72;
-    opacity: 10;
     position: relative;
     top: 50%;
     left: 50%;
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+    pointer-events: none;
 }
 
 .shell div::before, .shell div::after {
@@ -400,43 +478,43 @@ body { background-color: #00BFFF}
     border-top: 30px solid #636E72;
 }
 
-#red.shell div{
+#Red.shell div{
     background: #900000;
 }
-#red.shell div::after{
+#Red.shell div::after{
     border-top: 30px solid #900000;
 }
-#red.shell div::before{
+#Red.shell div::before{
     border-bottom: 30px solid #900000;
 }
 
-#green.shell div{
+#Green.shell div{
     background: #003200;
 }
-#green.shell div::after{
+#Green.shell div::after{
     border-top: 30px solid #003200;
 }
-#green.shell div::before{
+#Green.shell div::before{
     border-bottom: 30px solid #003200;
 }
 
-#yellow.shell div{
+#Yellow.shell div{
     background: #999900;
 }
-#yellow.shell div::after{
+#Yellow.shell div::after{
     border-top: 30px solid #999900;
 }
-#yellow.shell div::before{
+#Yellow.shell div::before{
     border-bottom: 30px solid #999900;
 }
 
-#blue.shell div{
+#Blue.shell div{
     background: #00007f;
 }
-#blue.shell div::after{
+#Blue.shell div::after{
     border-top: 30px solid #00007f;
 }
-#blue.shell div::before{
+#Blue.shell div::before{
     border-bottom: 30px solid #00007f;
 }
 
