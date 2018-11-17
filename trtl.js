@@ -1,14 +1,12 @@
 // movement and positioning vars
 var $window = $(window);
+var mov_speed = 3;
+var spin_rate = 0.02;
+var interval_rate = 20;
 var width = $window.width();
 var height = $window.height();
 var speed = 2;
-var spin_rate = .2;
 var max_spin = 5;
-var starting_positions = [[200, 100, -1, -1, -1 ,0],
-    [width - 500, height - 400, 1, 1, 1, 180],
-    [200, height - 400, 1, 1, -1, 1],
-    [width - 500, 100, 1, -1, 1, 90]];
 
 // core game vars
 var system_pattern = [];
@@ -21,39 +19,59 @@ var matching = true;
 var level = 0;
 var started = false;
 var colors = ["Red", "Yellow","Green", "Blue"];
+colors = shuffle(colors);
 
-// page element access vars
+// turtle models
 var turtles = new Array(4);
+
+// adjust sounds
+var wrong = document.getElementById("soundbuttonWrong");
+wrong.volume = .2;
+
+
+//x, y, x_dir, y_dir, spin, degree
+var starting_positions = [ [-50, -50, -1, -1, 0, 0],
+            [width - 250, height - 400, 1, 0, 0, 0],
+            [-50, height - 500, 1, 1, 0, 0],
+            [width - 500, 0, 1, -1, 0, 0]];
+
 for(var i = 1; i <= turtles.length; i++){
+
+    // set starting positions
     var pos = starting_positions[i-1];
+
+    // get turtle div
     var div = document.getElementById("trtl" + i);
+
+    // create turtle model
     turtles[i-1] = new Turtle(i, div, pos[0], pos[1], pos[2], pos[3], pos[4], pos[5]);
+
+    // set colors with css
+    turtles[i-1].div.getElementsByClassName("shell")[0].setAttribute("id", colors[i-1]);
+
+    // initalize movement
     init_turtle(i-1);
+
+
 }
 
-// set turtle colors
-shuffle(colors);
-
-for(var i = 0; i < turtles.length; i++){
-    turtles[i].div.getElementsByClassName("shell")[0].setAttribute("id", colors[i]);
-}
+/*
+//set colors
+turtles[0].div.getElementsByClassName("shell")[0].setAttribute("id", "red");
+turtles[1].div.getElementsByClassName("shell")[0].setAttribute("id", "blue");
+turtles[2].div.getElementsByClassName("shell")[0].setAttribute("id", "green");
+turtles[3].div.getElementsByClassName("shell")[0].setAttribute("id", "yellow");
+*/
 
 // turn on collision detection
-setInterval(BounceCollusion, 100);
+setInterval(BounceCollusion, (10 * interval_rate));
+
+
 
 // add button functionality to start button
 document.getElementById("startButton").setAttribute("onclick", "Start(event)");
 
-var wrong = document.getElementById("soundbuttonWrong");
-
-console.log(wrong);
-
-wrong.volume = .2;
-console.log(wrong.volume);
-
-
-//turtles[0].shell.getElementsByTagName('div')[0].setAttribute("onclick", "test()");
-
+// function that starts the game
 function Start(){
     console.log("start button clicked")
     started = true;
@@ -67,13 +85,14 @@ function Start(){
     setTimeout(function() {run_memory = setInterval(playMemory, 1000);}, 500);
 }
 
+// set turtle click handler
 $("div[class*='shell']").on("click", function(event) {
     if(started == false)
     {
         console.log(this.id + " clicked")
         $("#" + this.id).addClass("activated");
         setTimeout(function (id) {$("#" + id).removeClass("activated"); }, 500, this.id);
-        $("#soundbutton" + this.id).get(0).cloneNode().play();
+        $("#soundbutton" + this.id).get(0).play();
 
     }
     else if (event.which == 1) {
@@ -144,6 +163,7 @@ $("div[class*='shell']").on("click", function(event) {
     }
 });
 
+
 // turtle constructor
 function Turtle(index, div ,x ,y, x_dir, y_dir, spin, degree) {
     this.index = index;
@@ -161,16 +181,19 @@ function Turtle(index, div ,x ,y, x_dir, y_dir, spin, degree) {
     return this;
 }
 
+// set turtle into motion
 function init_turtle(x){
 
-    setInterval(BounceX, 20, turtles[x]);
-    setInterval(BounceY, 20, turtles[x]);
+    setInterval(BounceX, (2 * interval_rate), turtles[x]);
+    setInterval(BounceY, (2 * interval_rate), turtles[x]);
 }
 
 // "bounce" turtles off left and right boundries
 function BounceX (turtle){
 
-    turtle.x = turtle.x + speed * turtle.x_dir;
+
+    turtle.x = turtle.x + mov_speed * turtle.x_dir;
+
     turtle.div.style.left = turtle.x + "px";
     turtle.degree += turtle.spin;
     rotate(turtle.div, turtle.degree);
@@ -182,7 +205,7 @@ function BounceX (turtle){
 
     }
     // right boundry
-    else if(turtle.x > $window.width() - 400){
+    else if(turtle.x > $window.width() - 375){
         UpdateSpin(turtle, turtle.y_dir, true);
         turtle.x_dir = -1;
     }
@@ -190,17 +213,17 @@ function BounceX (turtle){
 
 // "bounce" turtles off top and bot boundries
 function BounceY (turtle){
-    turtle.y = turtle.y + speed * turtle.y_dir;
+    turtle.y = turtle.y + mov_speed * turtle.y_dir;
     turtle.div.style.top = turtle.y + "px";
 
     // top boundry
-    if(turtle.y < - 115){
+    if(turtle.y < - 135){
         UpdateSpin(turtle, turtle.x_dir, true);
         turtle.y_dir = 1;
 
     }
     // bottom boundry
-    else if( turtle.y > $window.height() - 400){
+    else if( turtle.y > $window.height() - 375){
         UpdateSpin(turtle, turtle.x_dir, false);
         turtle.y_dir = -1;
     }
@@ -216,29 +239,44 @@ function BounceCollusion (){
 
             var x_diff = t1.x - t2.x;
             var y_diff = t1.y - t2.y;
+            var proximity = 225;
 
-            if ((x_diff < 225 && x_diff > -225) && (y_diff < 225 && y_diff > -225)){
+            if ((x_diff < proximity && x_diff > -proximity) && (y_diff < proximity && y_diff > -proximity)){
+
                 // bounce x
                 if (t1.x > t2.x){
                 t1.x_dir = 1;
                 t2.x_dir = -1;
+                AverageSpin(t1, t2);
+
                 }
                 else{
                     t1.x_dir = -1;
                     t2.x_dir = 1;
+                    AverageSpin(t1, t2);
+
                 }
                 //bounce y
                 if(t1.y > t2.y){
                     t1.y_dir = 1;
                     t2.y_dir = -1;
+                    AverageSpin(t1, t2);
                 }
                 else{
                     t1.y_dir = -1;
                     t2.y_dir = 1;
+                    AverageSpin(t1, t2);
                 }
             }
         }
     }
+}
+
+function AverageSpin(t1, t2){
+
+    var spin_avg = t1.rotation + t2.rotation;
+    t1.roation = spin_avg / 2.0;
+    t2.rotation = spin_avg / 2.0;
 }
 
 function UpdateSpin (turtle, direction, top_or_right) {
@@ -282,10 +320,11 @@ function newMemory() {
     }
 }
 
+// display the pattern
 function playMemory() {
     $("#displayText").html(level);
     tempColor = system_pattern[system_index];
-    $("#soundbutton" + tempColor).get(0).cloneNode().play();
+    $("#soundbutton" + tempColor).get(0).play();
     $("#" + tempColor).addClass("activated");
     setTimeout(function(id) {$("#" + id).removeClass("activated");}, 300, tempColor);
     system_index++;
