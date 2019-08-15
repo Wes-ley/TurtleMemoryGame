@@ -55,14 +55,6 @@ for(var i = 1; i <= turtles.length; i++){
 
 }
 
-/*
-//set colors
-turtles[0].div.getElementsByClassName("shell")[0].setAttribute("id", "red");
-turtles[1].div.getElementsByClassName("shell")[0].setAttribute("id", "blue");
-turtles[2].div.getElementsByClassName("shell")[0].setAttribute("id", "green");
-turtles[3].div.getElementsByClassName("shell")[0].setAttribute("id", "yellow");
-*/
-
 // turn on collision detection
 setInterval(BounceCollusion, (10 * interval_rate));
 
