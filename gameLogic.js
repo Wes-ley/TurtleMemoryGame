@@ -24,35 +24,17 @@ colors = shuffle(colors);
 // turtle models
 var turtles = new Array(4);
 
-//TODO: get this to work so the sound isn't so jarring
 // adjust sounds
 var wrong = document.getElementById("soundbuttonWrong");
 wrong.volume = .2;
 
-// turtle constructor (encapsulates model data)
-function Turtle(index, div ,x ,y, x_dir, y_dir, spin, degree) {
-    this.index = index;
-    this.div = div;
-    this.shell = div.getElementsByClassName("shell")[0];
-    this.x = x
-    this.y = y
-    this.div.style.left = x + "px";
-    this.div.style.top = y + "px";
-    this.x_dir = x_dir;
-    this.y_dir = y_dir;
-    this.spin = spin;
-    this.degree = degree;
-    return this;
-}
 
-// TODO: clean up this file by moving static data to a json config file
-// static data for initializing turtle models [x-cord, y-cord, x_dir, y_dir, spin, degree/heading]
+//x, y, x_dir, y_dir, spin, degree
 var starting_positions = [ [-50, -50, -1, -1, 0, 0],
             [width - 250, height - 400, 1, 0, 0, 0],
             [-50, height - 500, 1, 1, 0, 0],
             [width - 500, 0, 1, -1, 0, 0]];
 
-// use the static data defined above to create turtle objects
 for(var i = 1; i <= turtles.length; i++){
 
     // set starting positions
@@ -69,12 +51,16 @@ for(var i = 1; i <= turtles.length; i++){
 
     // initalize movement
     init_turtle(i-1);
+
+
 }
 
 // turn on collision detection
 setInterval(BounceCollusion, (10 * interval_rate));
 
-// add onClick function to start button
+
+
+// add button functionality to start button
 document.getElementById("startButton").setAttribute("onclick", "Start(event)");
 
 // function that starts the game
@@ -99,6 +85,7 @@ $("div[class*='shell']").on("click", function(event) {
         $("#" + this.id).addClass("activated");
         setTimeout(function (id) {$("#" + id).removeClass("activated"); }, 500, this.id);
         $("#soundbutton" + this.id).get(0).play();
+
     }
     else if (event.which == 1) {
         console.log(this.id + " clicked")
@@ -127,6 +114,7 @@ $("div[class*='shell']").on("click", function(event) {
             level = 1;
             newMemory();
             setTimeout(function() {run_memory = setInterval(playMemory, tempo);}, 1000);
+
         }
         else {
             if (player_index == system_index) {
@@ -168,7 +156,22 @@ $("div[class*='shell']").on("click", function(event) {
 });
 
 
-
+// turtle constructor
+function Turtle(index, div ,x ,y, x_dir, y_dir, spin, degree) {
+    this.index = index;
+    this.div = div;
+    this.shell = div.getElementsByClassName("shell")[0];
+    this.x = x
+    this.y = y
+    this.div.style.left = x + "px";
+    this.div.style.top = y + "px";
+    this.x_dir = x_dir;
+    this.y_dir = y_dir;
+    this.spin = spin;
+    this.degree = degree;
+    //init_turtle(this.index);
+    return this;
+}
 
 // set turtle into motion
 function init_turtle(x){
